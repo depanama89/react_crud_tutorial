@@ -1,15 +1,17 @@
 
+import Book from './component/Book';
+// import { Container, Navbar, Row, Col } from "react-bootstrap";
+// import Addbook from './component/Addbook';
+// import BookList from './component/BookList';
+// import Datepicker from './Datepicker';
+// import Picker from './Picker';
+// import Home from './Home'
 import './App.css';
-import Datepicker from './Datepicker';
-import Picker from './Picker';
-import Home from './Home'
 
 function App() {
   return (
-    <div className="App">
-      {/* <Picker /> */}
-      {/* <Datepicker/> */}
-      <Home />
+    <div>
+      <Book/>
 
     </div>
   );
