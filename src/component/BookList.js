@@ -1,13 +1,35 @@
-import React, { useState } from 'react'
+import { DocumentReference } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react'
 import { Table, Button } from "react-bootstrap";
 import BookDataService from "../services/book.services";
 
 const BookList = () => {
+  const [books,setBooks] = useState([])
+
+  useEffect(()=>{
+    getBooks()
+  },[])
+
+  const getBooks = async () => {
+
+    const data = await BookDataService.getAllBooks()
+    console.log(data.docs)
+    setBooks(data.docs.map((doc)=>({...doc.data(), id:doc.id})))
+  }
+  const getBooksId = async()=>{
+
+  }
+
+  const deleteHandler = async(id) => {
+    await BookDataService.deleteBook(id)
+    getBooks()
+  }
     
   return (
     <>
+    {/* <pre>{JSON.stringify(books,undefined,2)}</pre> */}
       <div className="mb-2">
-        <Button variant="dark edit" >
+        <Button variant="dark edit" onClick={getBooks} >
           Refresh List 
         </Button>
       </div>
@@ -25,16 +47,20 @@ const BookList = () => {
         </thead>
         <tbody>
          
-            
-              <tr>
-                <td>id</td>
-                <td>title</td>
-                <td>author</td>
-                <td>status</td>
+            {books.map((doc,index)=>{
+              return(
+
+              
+              <tr key={doc.id}>
+                <td>{index+1}</td>
+                <td>{doc.title}</td>
+                <td>{doc.author}</td>
+                <td>{doc.status}</td>
                 <td>
                   <Button
                     variant="secondary"
                     className="edit"
+                    onClick={(e)=> getBooksId(doc.id)}
                    
                   >
                     Edit
@@ -42,13 +68,15 @@ const BookList = () => {
                   <Button
                     variant="danger"
                     className="delete"
+                    onClick={(e)=> deleteHandler(doc.id)}
                 
                   >
                     Delete
                   </Button>
                 </td>
               </tr>
-           
+           )
+          })}
          
         </tbody>
       </Table>
