@@ -1,14 +1,26 @@
 import { async } from '@firebase/util'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Form, Alert, InputGroup, Button, ButtonGroup } from "react-bootstrap";
 import BookDataservice from '../services/book.services'
 
-const Addbook = () => {
+const Addbook = ({ id,setBookId}) => {
     const [title,setTitle] = useState("")
     const [author,setAuthor] = useState("")
     const [status,setStatus]= useState("Available")
     const [flag,setFlag] = useState(true)
     const [message,setMessage] = useState({error: false,msg:""})
+
+    // var date1 = new Date();
+    // const formatDate=date1.getFullYear()+'-'+ (date1.getMonth() + 1) +'-'+date1.getDate();
+    // var today= new Date(formatDate)
+    // var date2 = new Date("2022-11-26");
+    // var Difference_In_Time = Math.abs(today.getTime() - date2.getTime());
+
+    // var Difference_In_Days =Math.ceil( Difference_In_Time / (1000 * 3600 * 24));
+    // console.log("Total number of days between dates  <br>"
+    //            + date1 + "<br> and <br>" 
+    //            + date2 + " is: <br> " 
+    //            + Difference_In_Days);
 
 
     const handleSubmit = async(e) =>{
@@ -25,8 +37,15 @@ const Addbook = () => {
         }
         console.log(newBook)
         try{
+         if(id !== undefined && id !== ""){
+          await BookDataservice.updateBook(id,newBook)
+          setBookId("")
+          setMessage({error: false,msg: "Updated successfully"})
+
+         }else {
           await BookDataservice.addBooks(newBook)
           setMessage({error: false,msg: "New Book added successfully"})
+         }
         } catch(err){
           setMessage({error:true, msg: err.message})
         }
@@ -34,6 +53,27 @@ const Addbook = () => {
         setAuthor("")
 
     }
+
+    const  editHander = async() =>{
+      setMessage("")
+      try{
+        const docSnap = await BookDataservice.getBook(id)
+        console.log("the record is:",docSnap.data)
+        setTitle(docSnap.data().title)
+        setAuthor(docSnap.data().author)
+        setStatus(docSnap.data().status)
+
+      }catch(err){
+        setMessage({error: true, msg:err.message})
+      }
+    }
+    useEffect(()=>{
+      console.log("The id here is :", id)
+      if(id !== undefined && id !== ""){
+        editHander()
+      }
+
+    },[id])
     return (
         <>
         <div className="p-4 box">
